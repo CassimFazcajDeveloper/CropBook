@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Card, Text, useTheme } from 'react-native-paper';
-import { negative, positive } from '../theme';
+import { cardBg, negative, positive } from '../theme';
 import { formatMK } from '../utils/currency';
 
 export function Money({
@@ -61,7 +61,7 @@ export function SectionCard({
 }) {
   const theme = useTheme();
   return (
-    <Card mode="contained" style={[styles.card, { backgroundColor: theme.colors.elevation.level2 }, style]} onPress={onPress}>
+    <Card mode="contained" style={[styles.card, { backgroundColor: cardBg(theme) }, style]} onPress={onPress}>
       <Card.Content style={{ gap: 12 }}>
         {title ? (
           <View style={styles.titleRow}>

@@ -3,9 +3,12 @@ import { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Card, IconButton, Text, useTheme } from 'react-native-paper';
 import { useShallow } from 'zustand/react/shallow';
+import { ThemeMenu } from '@/components/ThemeMenu';
 import { Money, SectionCard, Stat, TotalsRow } from '@/components/ui';
 import { balanceOf, useAccountsStore } from '@/stores/accountsStore';
 import { cropTotals, useFarmStore } from '@/stores/farmStore';
+import { cardBg, headerTint } from '@/theme';
+import { formatDate, todayISO } from '@/utils/dates';
 
 export default function Dashboard() {
   const theme = useTheme();
@@ -28,11 +31,27 @@ export default function Dashboard() {
       <Stack.Screen
         options={{
           headerRight: () => (
-            <IconButton icon="piggy-bank-outline" onPress={() => router.push('/accounts')} accessibilityLabel="Profit First" />
+            <View style={{ flexDirection: 'row' }}>
+              <ThemeMenu />
+              <IconButton
+                icon="wallet-outline"
+                iconColor={headerTint(theme)}
+                onPress={() => router.push('/accounts')}
+                accessibilityLabel="Profit First"
+              />
+            </View>
           ),
         }}
       />
       <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.greeting}>
+          <Text variant="headlineSmall" style={{ fontWeight: '700' }}>
+            Hello Saad 👋
+          </Text>
+          <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+            Welcome back · {formatDate(todayISO())}
+          </Text>
+        </View>
         <SectionCard title="All crops">
           <TotalsRow {...totals} />
         </SectionCard>
@@ -63,7 +82,7 @@ export default function Dashboard() {
               <Card
                 key={crop.id}
                 mode="contained"
-                style={[styles.cropCard, { backgroundColor: theme.colors.elevation.level2 }]}
+                style={[styles.cropCard, { backgroundColor: cardBg(theme) }]}
                 onPress={() => router.push({ pathname: '/crop/[id]', params: { id: String(crop.id) } })}
               >
                 <Card.Content style={{ gap: 6 }}>
@@ -103,6 +122,7 @@ const styles = StyleSheet.create({
   container: { padding: 16, gap: 16, paddingBottom: 40 },
   row: { flexDirection: 'row', gap: 12 },
   heading: { fontWeight: '600', marginTop: 4, marginLeft: 4 },
+  greeting: { gap: 2, marginLeft: 4 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 12 },
   cropCard: { width: '48.5%', borderRadius: 20, minHeight: 150 },
   addCard: { borderWidth: 1.5, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center', gap: 4 },

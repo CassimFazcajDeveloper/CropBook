@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Saad CropBook",
+    "name": "Sa'ad CropBook",
     "slug": "saad-cropbook",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -23,7 +23,20 @@
       "expo-router",
       "expo-sqlite",
       "@react-native-community/datetimepicker",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 288,
+          "resizeMode": "contain",
+          "backgroundColor": "#F8FAF2",
+          "dark": {
+            "image": "./assets/splash-icon.png",
+            "backgroundColor": "#121410"
+          }
+        }
+      ]
     ],
     "scheme": "saadcropbook",
     "experiments": {

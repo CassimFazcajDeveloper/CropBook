@@ -5,6 +5,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { Money, SectionCard, Stat } from '@/components/ui';
 import { balanceOf, useAccountsStore } from '@/stores/accountsStore';
 import { sumBy, useFarmStore } from '@/stores/farmStore';
+import { headerTint } from '@/theme';
 
 const ICONS = ['🚜', '💎', '👤', '🏦', '📦', '🎯'];
 
@@ -23,7 +24,7 @@ export default function AccountsScreen() {
       <Stack.Screen
         options={{
           headerRight: () => (
-            <IconButton icon="tune-variant" accessibilityLabel="Edit accounts" onPress={() => router.push('/form/accounts')} />
+            <IconButton icon="tune-variant" iconColor={headerTint(theme)} accessibilityLabel="Edit accounts" onPress={() => router.push('/form/accounts')} />
           ),
         }}
       />

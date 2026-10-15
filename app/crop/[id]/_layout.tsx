@@ -6,6 +6,7 @@ import { IconButton, Text, useTheme } from 'react-native-paper';
 import { useShallow } from 'zustand/react/shallow';
 import { EmptyState, TotalsRow } from '@/components/ui';
 import { cropTotals, useFarmStore } from '@/stores/farmStore';
+import { headerTint } from '@/theme';
 
 export default function CropLayout() {
   const theme = useTheme();
@@ -33,6 +34,7 @@ export default function CropLayout() {
           headerRight: () => (
             <IconButton
               icon="pencil-outline"
+              iconColor={headerTint(theme)}
               accessibilityLabel="Edit crop"
               onPress={() => router.push({ pathname: '/form/crop', params: { id: String(crop.id) } })}
             />

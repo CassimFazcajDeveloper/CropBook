@@ -1,5 +1,5 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
-import { SCHEMA_V1 } from './schema';
+import { SCHEMA_V1, SCHEMA_V2 } from './schema';
 
 async function seedV1(db: SQLiteDatabase) {
   const now = new Date().toISOString();
@@ -30,6 +30,9 @@ const MIGRATIONS: ((db: SQLiteDatabase) => Promise<void>)[] = [
   async (db) => {
     await db.execAsync(SCHEMA_V1);
     await seedV1(db);
+  },
+  async (db) => {
+    await db.execAsync(SCHEMA_V2);
   },
 ];
 

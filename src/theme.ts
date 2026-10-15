@@ -74,5 +74,8 @@ export const darkTheme: MD3Theme = {
   },
 };
 
-export const positive = (theme: MD3Theme) => (theme.dark ? '#8FD685' : '#2E7D32');
+export const headerBg = (theme: MD3Theme) => (theme.dark ? theme.colors.primaryContainer : theme.colors.primary);
+export const headerTint = (theme: MD3Theme) => (theme.dark ? theme.colors.onPrimaryContainer : theme.colors.onPrimary);
+
+export const positive =(theme: MD3Theme) => (theme.dark ? '#8FD685' : '#2E7D32');
 export const negative = (theme: MD3Theme) => theme.colors.error;
