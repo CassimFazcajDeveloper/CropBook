@@ -41,6 +41,12 @@
     "scheme": "saadcropbook",
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b344a2d4-c864-435a-8048-b3928b9b0d14"
+      }
     }
   }
 }
