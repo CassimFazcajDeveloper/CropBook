@@ -16,12 +16,10 @@ export default function HarvestForm() {
   const [date, setDate] = useState(existing?.date ?? todayISO());
   const [note, setNote] = useState(existing?.note ?? '');
   const [error, setError] = useState<string>();
-  const [saving, setSaving] = useState(false);
 
   const save = async () => {
     const qty = parseNumber(quantity);
     if (qty === null || qty <= 0) return setError('Enter how much you harvested');
-    setSaving(true);
     const row = { cropId: Number(cropId), date, quantity: qty, unit, note: note.trim() };
     if (existing) await updateRecord('harvests', { ...row, id: existing.id });
     else await addRecord('harvests', row);
@@ -31,7 +29,7 @@ export default function HarvestForm() {
   return (
     <>
       <Stack.Screen options={{ title: existing ? 'Edit harvest' : 'New harvest' }} />
-      <FormScreen onSave={save} saving={saving}>
+      <FormScreen onSave={save}>
         <Field label="Quantity" value={quantity} onChangeText={(t) => { setQuantity(t); setError(undefined); }} numeric error={error} autoFocus={!existing} />
         <ChipGroup label="Unit" options={HARVEST_UNITS} value={unit} onChange={setUnit} />
         <DateField label="Date" value={date} onChange={setDate} />

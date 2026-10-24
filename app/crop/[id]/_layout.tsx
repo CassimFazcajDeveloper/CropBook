@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { View } from 'react-native';
 import { IconButton, Text, useTheme } from 'react-native-paper';
 import { useShallow } from 'zustand/react/shallow';
+import { CropIdContext } from '@/components/CropContext';
 import { EmptyState, TotalsRow } from '@/components/ui';
 import { cropTotals, useFarmStore } from '@/stores/farmStore';
 import { headerTint } from '@/theme';
@@ -47,6 +48,7 @@ export default function CropLayout() {
         </Text>
         <TotalsRow {...totals} />
       </View>
+      <CropIdContext.Provider value={String(crop.id)}>
       <TopTabs
         screenOptions={{
           tabBarStyle: { backgroundColor: theme.colors.background, elevation: 0, shadowOpacity: 0 },
@@ -63,6 +65,7 @@ export default function CropLayout() {
         <TopTabs.Screen name="harvest" options={{ title: 'Harvest' }} />
         <TopTabs.Screen name="sales" options={{ title: 'Sales' }} />
       </TopTabs>
+      </CropIdContext.Provider>
     </View>
   );
 }

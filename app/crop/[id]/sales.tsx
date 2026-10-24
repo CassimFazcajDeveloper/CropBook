@@ -1,4 +1,5 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
+import { useCropId } from '@/components/CropContext';
 import { useMemo } from 'react';
 import { useTheme } from 'react-native-paper';
 import { RecordList } from '@/components/RecordList';
@@ -10,7 +11,7 @@ import { formatDate } from '@/utils/dates';
 
 export default function SalesTab() {
   const theme = useTheme();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const id = useCropId();
   const cropId = Number(id);
   const all = useFarmStore((s) => s.sales);
   const rows = useMemo(() => all.filter((r) => r.cropId === cropId), [all, cropId]);

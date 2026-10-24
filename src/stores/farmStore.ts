@@ -65,52 +65,51 @@ export const useFarmStore = create<FarmState>((set, get) => ({
     set({ crops, inputs, activities, harvests, sales });
   },
 
+  // Every write re-reads from SQLite so the store always mirrors what is on disk.
   async addCrop(name, emoji) {
     const crop = await cropsRepo.insert({ name: name.trim(), emoji, createdAt: new Date().toISOString() });
-    set({ crops: [...get().crops, crop] });
+    set({ crops: await cropsRepo.list() });
     return crop;
   },
 
   async updateCrop(crop) {
     await cropsRepo.update(crop);
-    set({ crops: get().crops.map((c) => (c.id === crop.id ? crop : c)) });
+    set({ crops: await cropsRepo.list() });
   },
 
   async deleteCrop(id) {
     await cropsRepo.remove(id);
-    const s = get();
-    set({
-      crops: s.crops.filter((c) => c.id !== id),
-      inputs: s.inputs.filter((r) => r.cropId !== id),
-      activities: s.activities.filter((r) => r.cropId !== id),
-      harvests: s.harvests.filter((r) => r.cropId !== id),
-      sales: s.sales.filter((r) => r.cropId !== id),
-    });
+    // Deleting a crop cascades to its records, so reload everything.
+    await get().loadAll();
   },
 
   async addRecord(kind, row) {
+    if (!Number.isInteger(row.cropId)) throw new Error('No crop selected. Go back to the crop and try again.');
     const saved = await repos[kind].insert(row);
-    set({ [kind]: sortNewest([...(get()[kind] as RecordMap[typeof kind][]), saved]) } as Partial<FarmState>);
+    await reloadKind(set, kind);
     return saved;
   },
 
   async updateRecord(kind, row) {
     await repos[kind].update(row);
-    const rows = (get()[kind] as RecordMap[typeof kind][]).map((r) => (r.id === row.id ? row : r));
-    set({ [kind]: sortNewest(rows) } as Partial<FarmState>);
+    await reloadKind(set, kind);
   },
 
   async deleteRecord(kind, row) {
     await repos[kind].remove(row.id);
-    const rows = (get()[kind] as RecordMap[typeof kind][]).filter((r) => r.id !== row.id);
-    set({ [kind]: rows } as Partial<FarmState>);
+    await reloadKind(set, kind);
   },
 
   async restoreRecord(kind, row) {
     await repos[kind].restore(row);
-    set({ [kind]: sortNewest([...(get()[kind] as RecordMap[typeof kind][]), row]) } as Partial<FarmState>);
+    await reloadKind(set, kind);
   },
 }));
+
+async function reloadKind(set: (s: Partial<FarmState>) => void, kind: RecordKind) {
+  const rows = await (repos[kind] as Repo<RecordMap[RecordKind]>).list();
+  set({ [kind]: sortNewest(rows) } as Partial<FarmState>);
+}
 
 export function sumBy<T>(rows: T[], pick: (r: T) => number): number {
   return rows.reduce((acc, r) => acc + pick(r), 0);

@@ -1,4 +1,5 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
+import { useCropId } from '@/components/CropContext';
 import { useMemo } from 'react';
 import { RecordList } from '@/components/RecordList';
 import { sumBy, useFarmStore } from '@/stores/farmStore';
@@ -6,7 +7,7 @@ import { formatMK, formatQty } from '@/utils/currency';
 import { formatDate } from '@/utils/dates';
 
 export default function InputsTab() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const id = useCropId();
   const cropId = Number(id);
   const all = useFarmStore((s) => s.inputs);
   const rows = useMemo(() => all.filter((r) => r.cropId === cropId), [all, cropId]);

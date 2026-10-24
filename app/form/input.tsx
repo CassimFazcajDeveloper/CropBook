@@ -22,7 +22,6 @@ export default function InputForm() {
   const [date, setDate] = useState(existing?.datePurchased ?? todayISO());
   const [note, setNote] = useState(existing?.note ?? '');
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [saving, setSaving] = useState(false);
 
   const save = async () => {
     const e: Record<string, string> = {};
@@ -33,7 +32,6 @@ export default function InputForm() {
     if (money === null || money < 0) e.cost = 'Enter the cost in kwacha';
     setErrors(e);
     if (Object.keys(e).length) return;
-    setSaving(true);
     const row = {
       cropId: Number(cropId),
       item: item.trim(),
@@ -51,7 +49,7 @@ export default function InputForm() {
   return (
     <>
       <Stack.Screen options={{ title: existing ? 'Edit input' : 'New input' }} />
-      <FormScreen onSave={save} saving={saving}>
+      <FormScreen onSave={save}>
         <Field label="Item" value={item} onChangeText={setItem} error={errors.item} placeholder="e.g. Seed" />
         <View style={styles.chips}>
           {ITEMS.map((i) => (

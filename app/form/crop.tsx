@@ -21,12 +21,10 @@ export default function CropForm() {
   const [name, setName] = useState(existing?.name ?? '');
   const [emoji, setEmoji] = useState(existing?.emoji ?? '🌱');
   const [error, setError] = useState<string>();
-  const [saving, setSaving] = useState(false);
   const [confirm, setConfirm] = useState(false);
 
   const save = async () => {
     if (!name.trim()) return setError('Give the crop a name');
-    setSaving(true);
     if (existing) await updateCrop({ ...existing, name: name.trim(), emoji });
     else await addCrop(name, emoji);
     router.back();
@@ -43,7 +41,7 @@ export default function CropForm() {
   return (
     <>
       <Stack.Screen options={{ title: existing ? 'Edit crop' : 'New crop' }} />
-      <FormScreen onSave={save} saving={saving} onDelete={existing ? () => setConfirm(true) : undefined}>
+      <FormScreen onSave={save} onDelete={existing ? () => setConfirm(true) : undefined}>
         <View style={[styles.preview, { backgroundColor: theme.colors.primaryContainer }]}>
           <Text style={{ fontSize: 56 }}>{emoji}</Text>
         </View>

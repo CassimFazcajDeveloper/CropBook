@@ -9,29 +9,49 @@ import { formatDate, fromISODate, toISODate } from '../utils/dates';
 export function FormScreen({
   children,
   onSave,
-  saving,
   onDelete,
   saveLabel = 'Save',
 }: {
   children: ReactNode;
-  onSave: () => void;
-  saving?: boolean;
+  onSave: () => void | Promise<void>;
   onDelete?: () => void;
   saveLabel?: string;
 }) {
   const insets = useSafeAreaInsets();
+  const [saving, setSaving] = useState(false);
+  const [failure, setFailure] = useState<string>();
+
+  // Owns the busy state so a failed save always stops the spinner and shows why.
+  const save = async () => {
+    setSaving(true);
+    setFailure(undefined);
+    try {
+      await onSave();
+    } catch (e) {
+      console.error('Save failed', e);
+      setFailure(e instanceof Error ? e.message : String(e));
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
         {children}
       </ScrollView>
+      {failure ? (
+        <HelperText type="error" visible style={{ paddingHorizontal: 16 }}>
+          Couldn't save: {failure}
+        </HelperText>
+      ) : null}
       <View style={[styles.footer, { paddingBottom: 12 + insets.bottom }]}>
         {onDelete ? (
           <Button mode="outlined" icon="delete-outline" onPress={onDelete} style={{ flex: 1 }} contentStyle={styles.btn}>
             Delete
           </Button>
         ) : null}
-        <Button mode="contained" onPress={onSave} loading={saving} disabled={saving} style={{ flex: 2 }} contentStyle={styles.btn}>
+        <Button mode="contained" onPress={save} loading={saving} disabled={saving} style={{ flex: 2 }} contentStyle={styles.btn}>
           {saveLabel}
         </Button>
       </View>

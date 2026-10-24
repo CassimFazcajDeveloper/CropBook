@@ -22,7 +22,6 @@ export default function SaleForm() {
   const [buyer, setBuyer] = useState(existing?.buyer ?? '');
   const [note, setNote] = useState(existing?.note ?? '');
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [saving, setSaving] = useState(false);
 
   const qty = parseNumber(quantity);
   const ppu = parseMoney(price);
@@ -34,7 +33,6 @@ export default function SaleForm() {
     if (ppu === null || ppu < 0) e.price = 'Enter the price per unit';
     setErrors(e);
     if (Object.keys(e).length) return;
-    setSaving(true);
     const row = {
       cropId: Number(cropId),
       date,
@@ -53,7 +51,7 @@ export default function SaleForm() {
   return (
     <>
       <Stack.Screen options={{ title: existing ? 'Edit sale' : 'New sale' }} />
-      <FormScreen onSave={save} saving={saving}>
+      <FormScreen onSave={save}>
         <Field label="Quantity" value={quantity} onChangeText={setQuantity} numeric error={errors.quantity} autoFocus={!existing} />
         <ChipGroup label="Unit" options={HARVEST_UNITS} value={unit} onChange={setUnit} />
         <Field label={`Price per ${unit.replace(/s$/, '')}`} value={price} onChangeText={setPrice} numeric prefix="MK" error={errors.price} />

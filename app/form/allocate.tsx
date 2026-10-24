@@ -32,7 +32,6 @@ export default function AllocateForm() {
   const [date, setDate] = useState(todayISO());
   const [note, setNote] = useState('');
   const [error, setError] = useState<string>();
-  const [saving, setSaving] = useState(false);
 
   const amount = parseMoney(amountText) ?? 0;
   const partValues = parts.map((p) => parseMoney(p) ?? 0);
@@ -57,7 +56,6 @@ export default function AllocateForm() {
     if (amount <= 0) return setError('Enter an amount to allocate');
     if (partValues.some((v) => v < 0)) return setError('Amounts cannot be negative');
     if (diff !== 0) return setError(`Split must add up to ${formatMK(amount)}`);
-    setSaving(true);
     await useAccountsStore.getState().addAllocations(
       accounts
         .map((a, i) => ({
@@ -73,7 +71,7 @@ export default function AllocateForm() {
   };
 
   return (
-    <FormScreen onSave={save} saving={saving} saveLabel="Save allocation">
+    <FormScreen onSave={save} saveLabel="Save allocation">
       <SegmentedButtons
         value={source}
         onValueChange={(v) => {

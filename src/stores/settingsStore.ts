@@ -10,7 +10,7 @@ interface SettingsState {
   setThemeMode: (mode: ThemeMode) => Promise<void>;
 }
 
-export const useSettingsStore = create<SettingsState>((set) => ({
+export const useSettingsStore = create<SettingsState>((set, get) => ({
   themeMode: 'system',
 
   async load() {
@@ -21,5 +21,6 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   async setThemeMode(mode) {
     set({ themeMode: mode });
     await settingsRepo.set('themeMode', mode);
+    await get().load();
   },
 }));

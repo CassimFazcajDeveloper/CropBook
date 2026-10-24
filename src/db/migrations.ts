@@ -1,15 +1,24 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 import { SCHEMA_V1, SCHEMA_V2 } from './schema';
 
+async function isEmpty(db: SQLiteDatabase, table: string) {
+  const row = await db.getFirstAsync<{ n: number }>(`SELECT COUNT(*) AS n FROM ${table}`);
+  return (row?.n ?? 0) === 0;
+}
+
+// Defaults only go into empty tables, so a re-run never duplicates the user's data.
 async function seedV1(db: SQLiteDatabase) {
   const now = new Date().toISOString();
-  for (const [name, emoji] of [
-    ['Tomatoes', '🍅'],
-    ['Onions', '🧅'],
-    ['Maize', '🌽'],
-  ]) {
-    await db.runAsync('INSERT INTO crops (name, emoji, createdAt) VALUES (?, ?, ?)', name, emoji, now);
+  if (await isEmpty(db, 'crops')) {
+    for (const [name, emoji] of [
+      ['Tomatoes', '🍅'],
+      ['Onions', '🧅'],
+      ['Maize', '🌽'],
+    ]) {
+      await db.runAsync('INSERT INTO crops (name, emoji, createdAt) VALUES (?, ?, ?)', name, emoji, now);
+    }
   }
+  if (!(await isEmpty(db, 'accounts'))) return;
   const accounts: [string, number][] = [
     ['Operations', 50],
     ['Profit', 10],
@@ -41,10 +50,12 @@ export async function migrate(db: SQLiteDatabase) {
   let version = row?.user_version ?? 0;
   while (version < MIGRATIONS.length) {
     const step = MIGRATIONS[version];
+    const next = version + 1;
+    // Bump user_version in the same transaction so a step and its version commit together.
     await db.withExclusiveTransactionAsync(async (tx) => {
       await step(tx);
+      await tx.execAsync(`PRAGMA user_version = ${next}`);
     });
-    version += 1;
-    await db.execAsync(`PRAGMA user_version = ${version}`);
+    version = next;
   }
 }

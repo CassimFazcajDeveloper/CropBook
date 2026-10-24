@@ -7,7 +7,7 @@ import { useColorScheme } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { LaunchScreen } from '@/components/LaunchScreen';
-import { initDb } from '@/db/client';
+import { getDb } from '@/db';
 import { useAccountsStore } from '@/stores/accountsStore';
 import { useFarmStore } from '@/stores/farmStore';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -32,7 +32,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     const minDelay = new Promise((r) => setTimeout(r, 1400));
-    initDb()
+    getDb()
       .then(() => Promise.all([loadFarm(), loadAccounts(), loadSettings(), minDelay]))
       .then(() => setReady(true))
       .catch((e: unknown) => setError(String(e)));

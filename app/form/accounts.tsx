@@ -12,7 +12,6 @@ export default function EditAccounts() {
   const accounts = useAccountsStore((s) => s.accounts);
   const [drafts, setDrafts] = useState(accounts.map((a) => ({ ...a, pct: String(a.targetPercent) })));
   const [error, setError] = useState<string>();
-  const [saving, setSaving] = useState(false);
 
   const total = drafts.reduce((acc, d) => acc + (parseNumber(d.pct) ?? 0), 0);
 
@@ -26,7 +25,6 @@ export default function EditAccounts() {
     const pcts = drafts.map((d) => parseNumber(d.pct));
     if (pcts.some((p) => p === null || p < 0 || !Number.isInteger(p))) return setError('Use whole percentages');
     if (total !== 100) return setError(`Percentages must total 100% (now ${total}%)`);
-    setSaving(true);
     await useAccountsStore.getState().saveAccounts(
       drafts.map(({ pct, ...a }) => ({ ...a, name: a.name.trim(), targetPercent: parseNumber(pct) ?? 0 })),
     );
@@ -34,7 +32,7 @@ export default function EditAccounts() {
   };
 
   return (
-    <FormScreen onSave={save} saving={saving}>
+    <FormScreen onSave={save}>
       {drafts.map((d, i) => (
         <View key={d.id} style={styles.row}>
           <View style={{ flex: 2 }}>

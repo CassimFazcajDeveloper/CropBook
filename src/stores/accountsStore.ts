@@ -25,7 +25,7 @@ export const useAccountsStore = create<AccountsState>((set, get) => ({
     await inTransaction(async () => {
       for (const a of accounts) await accountsRepo.update(a);
     });
-    set({ accounts: [...accounts].sort((a, b) => a.sortOrder - b.sortOrder) });
+    set({ accounts: await accountsRepo.list() });
   },
 
   async addAllocations(rows) {
@@ -37,7 +37,7 @@ export const useAccountsStore = create<AccountsState>((set, get) => ({
 
   async deleteAllocation(row) {
     await allocationsRepo.remove(row.id);
-    set({ allocations: get().allocations.filter((a) => a.id !== row.id) });
+    set({ allocations: await allocationsRepo.list() });
   },
 
   async restoreAllocation(row) {

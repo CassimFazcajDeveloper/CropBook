@@ -9,7 +9,7 @@ import type {
   New,
   Sale,
 } from '../types';
-import { getDb } from './client';
+import { getDb } from './index';
 
 export interface Repo<T extends { id: number }> {
   list(): Promise<T[]>;
@@ -30,22 +30,22 @@ function makeRepo<T extends { id: number }>(
   const values = (row: New<T>) => columns.map((c) => row[c] as SQLiteBindValue);
 
   return {
-    list: () => getDb().getAllAsync<T>(`SELECT * FROM ${table} ORDER BY ${orderBy}`),
+    list: async () => (await getDb()).getAllAsync<T>(`SELECT * FROM ${table} ORDER BY ${orderBy}`),
     async insert(row) {
-      const res = await getDb().runAsync(`INSERT INTO ${table} (${cols}) VALUES (${marks})`, values(row));
+      const res = await (await getDb()).runAsync(`INSERT INTO ${table} (${cols}) VALUES (${marks})`, values(row));
       return { ...row, id: res.lastInsertRowId } as T;
     },
     async restore(row) {
-      await getDb().runAsync(`INSERT INTO ${table} (id, ${cols}) VALUES (?, ${marks})`, [
+      await (await getDb()).runAsync(`INSERT INTO ${table} (id, ${cols}) VALUES (?, ${marks})`, [
         row.id,
         ...values(row),
       ]);
     },
     async update(row) {
-      await getDb().runAsync(`UPDATE ${table} SET ${sets} WHERE id = ?`, [...values(row), row.id]);
+      await (await getDb()).runAsync(`UPDATE ${table} SET ${sets} WHERE id = ?`, [...values(row), row.id]);
     },
     async remove(id) {
-      await getDb().runAsync(`DELETE FROM ${table} WHERE id = ?`, id);
+      await (await getDb()).runAsync(`DELETE FROM ${table} WHERE id = ?`, id);
     },
   };
 }
@@ -90,11 +90,11 @@ export const allocationsRepo = makeRepo<Allocation>(
 
 export const settingsRepo = {
   async get(key: string): Promise<string | null> {
-    const row = await getDb().getFirstAsync<{ value: string }>('SELECT value FROM settings WHERE key = ?', key);
+    const row = await (await getDb()).getFirstAsync<{ value: string }>('SELECT value FROM settings WHERE key = ?', key);
     return row?.value ?? null;
   },
   async set(key: string, value: string): Promise<void> {
-    await getDb().runAsync(
+    await (await getDb()).runAsync(
       'INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
       key,
       value,
@@ -103,5 +103,5 @@ export const settingsRepo = {
 };
 
 export async function inTransaction(task: () => Promise<void>) {
-  await getDb().withTransactionAsync(task);
+  await (await getDb()).withTransactionAsync(task);
 }
